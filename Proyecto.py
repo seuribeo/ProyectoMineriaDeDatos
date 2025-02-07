@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import os
-import opendatasets as od
 
 # Información sobre el dataset
 st.markdown("""
@@ -14,21 +13,15 @@ This dataset is useful for predictive modeling, epidemiological studies, and hea
 # Título de la aplicación
 st.title("Predicción de Alzheimer")
 
-# Descargar dataset automáticamente desde Kaggle
-kaggle_url = "https://www.kaggle.com/datasets/ankushpanday1/alzheimers-prediction-dataset-global"
+# Ruta del dataset (asumiendo que ya está descargado en el entorno de ejecución)
 data_path = "alzheimers_dataset"
+csv_file = "alzheimers_data.csv"  # Ajustar al nombre correcto del archivo en el dataset
 
-if not os.path.exists(data_path):
-    with st.spinner("Descargando dataset de Kaggle..."):
-        od.download(kaggle_url)
-
-# Buscar el archivo CSV dentro del dataset descargado
-csv_files = [f for f in os.listdir(data_path) if f.endswith(".csv")]
-if csv_files:
-    df = pd.read_csv(os.path.join(data_path, csv_files[0]))
-    st.success("Dataset descargado y cargado correctamente.")
+if os.path.exists(os.path.join(data_path, csv_file)):
+    df = pd.read_csv(os.path.join(data_path, csv_file))
+    st.success("Dataset cargado correctamente.")
 else:
-    st.error("No se encontró un archivo CSV en el dataset descargado.")
+    st.error("No se encontró el archivo CSV. Asegúrate de que el dataset está en la ruta correcta.")
     st.stop()
 
 # Mostrar opciones de estadísticas descriptivas
@@ -43,5 +36,5 @@ elif option == "Estadísticas descriptivas":
     st.write(df.describe())
 elif option == "Información del dataset":
     st.subheader("Información del Dataset")
-    st.text(df.info())
+    st.text(str(df.info()))
 
