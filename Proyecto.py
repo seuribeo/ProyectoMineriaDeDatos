@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import os
 
 # Información sobre el dataset
 st.markdown("""
@@ -9,17 +8,22 @@ This dataset contains 74,283 records from 20 countries, providing insights into 
 
 This dataset is useful for predictive modeling, epidemiological studies, and healthcare research on Alzheimer’s disease.
 """)
-# Descargar el dataset desde Kaggle
-path = kagglehub.dataset_download("ankushpanday1/alzheimers-prediction-dataset-global")
-
-# Verificar la ruta donde se descargó el dataset
-print("Path to dataset files:", path)
-
-# Listar archivos dentro del dataset
-print("Archivos en el dataset:", os.listdir(path))
 
 # Cargar el archivo CSV en un DataFrame
-# Asegúrate de usar el nombre correcto del archivo dentro de la carpeta descargada
-archivo_csv = [f for f in os.listdir(path) if f.endswith(".csv")][0]  # Encuentra el archivo CSV automáticamente
-df = pd.read_csv(os.path.join(path, archivo_csv))
+file_path = "alzheimers_prediction_dataset.csv"  # Asegúrate de que el archivo está en el mismo directorio del script
+
+try:
+    df = pd.read_csv(file_path)
+
+    # Mostrar las primeras filas del dataset
+    st.subheader("Dataset Preview")
+    st.write(df.head())
+
+    # Mostrar estadísticas descriptivas
+    st.subheader("Descriptive Statistics")
+    st.write(df.describe())
+
+except FileNotFoundError:
+    st.error(f"El archivo {file_path} no se encontró. Asegúrate de que está en la misma carpeta que el script.")
+
 
