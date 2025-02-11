@@ -128,34 +128,8 @@ try:
             except Exception as e:
                 st.sidebar.error(f"Ocurrió un error al hacer la predicción: {str(e)}")
 
-import streamlit as st
-import gzip
-import pickle
-
-# Cargar el modelo
-@st.cache_resource
-def load_model():
-    filename = "mejor_modelo_redes.pkl.gz"
-    with gzip.open(filename, 'rb') as f:
-        model = pickle.load(f)
-    return model
-
-# Cargar el modelo
-model = load_model()
-
-# Mejores hiperparámetros encontrados
-best_hyperparameters = {
-    'depth': 5,
-    'epochs': 8,
-    'num_units': 192,
-    'optimizer': 'adam',
-    'activation': 'relu',
-    'batch_size': 80,
-    'learning_rate': 0.00048440417181462694
-}
-
-# Precisión del modelo
-accuracy = 0.7094  # Ajusta según sea necesario
+            # Precisión del modelo
+            accuracy = 0.7094  # Ajusta según sea necesario
 
 # Diseño en Streamlit
 st.markdown("## 🎯 Mejores Hiperparámetros Encontrados")
