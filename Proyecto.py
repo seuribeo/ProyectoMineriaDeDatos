@@ -180,10 +180,17 @@ st.write(df.head(num_rows))
 st.subheader("📊 Estadísticas Descriptivas")
 st.write(df.describe())
 
-# **Cantidad de categorías en variables categóricas**
+# **Cantidad de categorías y sus valores en variables categóricas**
 st.subheader("📌 Variables Categóricas - Cantidad de Categorías")
-categorias_por_variable = df.select_dtypes(include=['object']).nunique()
-st.write(categorias_por_variable)
+
+categorical_columns = df.select_dtypes(include=['object']).columns
+categorias_info = {col: {"Cantidad": df[col].nunique(), "Categorías": df[col].unique().tolist()} for col in categorical_columns}
+
+# Convertir a DataFrame para una mejor visualización
+categorias_df = pd.DataFrame.from_dict(categorias_info, orient='index')
+
+# Mostrar tabla en Streamlit
+st.dataframe(categorias_df)
 
 # **Gráficos de distribución**
 st.subheader("📈 Distribución de Variables Numéricas")
