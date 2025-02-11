@@ -94,7 +94,7 @@ try:
     """)
 
     st.sidebar.title("## 📊 Precisión del Modelo")
-    st.metric(label="🔍 Accuracy del modelo", value=f"{accuracy:.2%}")
+    st.sidebar.metric(label="🔍 Accuracy del modelo", value=f"{accuracy:.2%}")
 
     
     # **Formulario para predicción**
