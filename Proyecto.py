@@ -133,3 +133,13 @@ except FileNotFoundError:
 
 # **Información general del dataset**
 st.subheader("📂 Información del Dataset")
+
+# Mostrar el número de registros y columnas
+st.markdown(f"- **Número de registros:** {df.shape[0]:,}")
+st.markdown(f"- **Número de columnas:** {df.shape[1]}")
+
+# Mostrar la cantidad de variables categóricas y numéricas
+num_categoricas = df.select_dtypes(include=['object']).shape[1]
+num_numericas = df.select_dtypes(include=['number']).shape[1]
+st.markdown(f"- **Variables categóricas:** {num_categoricas}")
+st.markdown(f"- **Variables numéricas:** {num_numericas}")
