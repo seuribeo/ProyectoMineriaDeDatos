@@ -128,7 +128,7 @@ try:
             except Exception as e:
                 st.sidebar.error(f"Ocurrió un error al hacer la predicción: {str(e)}")
 
-    import streamlit as st
+import streamlit as st
 import gzip
 import pickle
 
