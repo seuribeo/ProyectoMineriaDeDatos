@@ -91,23 +91,6 @@ try:
     st.subheader("📊 Estadísticas Descriptivas")
     st.write(df.describe())
 
-    # **Gráficos de distribución**
-    st.subheader("📈 Distribución de Variables Numéricas")
-    columna_numerica = st.selectbox("📌 Selecciona una variable numérica:", df.select_dtypes(include=['number']).columns)
-    fig, ax = plt.subplots()
-    sns.histplot(df[columna_numerica], kde=True, bins=30, ax=ax)
-    ax.set_title(f"Distribución de {columna_numerica}")
-    st.pyplot(fig)
-
-    # **Gráfico de barras para variables categóricas**
-    st.subheader("📊 Visualización de Variables Categóricas")
-    columna_categorica = st.selectbox("📌 Selecciona una variable categórica:", df.select_dtypes(include=['object']).columns)
-    fig, ax = plt.subplots()
-    df[columna_categorica].value_counts().plot(kind="bar", ax=ax, color="skyblue")
-    ax.set_title(f"Distribución de {columna_categorica}")
-    st.pyplot(fig)
-
-try:
     # **Sección de Predicción en la Barra Lateral**
     st.sidebar.subheader("🧠 Predicción de Alzheimer")
 
