@@ -189,8 +189,6 @@ categorias_info = {col: {"Cantidad": df[col].nunique(), "Categorías": df[col].u
 # Convertir a DataFrame
 categorias_df = pd.DataFrame.from_dict(categorias_info, orient='index')
 
-# Mostrar en formato de texto si hay demasiadas categorías
-st.text(categorias_df.to_string())
 
 
 # Mostrar tabla en Streamlit
