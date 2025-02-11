@@ -185,6 +185,3 @@ fig, ax = plt.subplots()
 df[columna_categorica].value_counts().plot(kind="bar", ax=ax, color="skyblue")
 ax.set_title(f"Distribución de {columna_categorica}")
 st.pyplot(fig)
-
-except FileNotFoundError:
-    st.error(f"⚠️ El archivo {file_path} no se encontró. Asegúrate de que está en la misma carpeta que el script.")
