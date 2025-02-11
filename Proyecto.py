@@ -107,53 +107,58 @@ try:
     ax.set_title(f"Distribución de {columna_categorica}")
     st.pyplot(fig)
 
-# **Sección de Predicción en la Barra Lateral**
-st.sidebar.subheader("🧠 Predicción de Alzheimer")
+try:
+    # **Sección de Predicción en la Barra Lateral**
+    st.sidebar.subheader("🧠 Predicción de Alzheimer")
 
-# Cargar modelo y label encoders
-@st.cache_resource
-def load_model():
-    with gzip.open("mejor_modelo_redes.pkl.gz", 'rb') as f:
-        return pickle.load(f)
+    # Cargar modelo y label encoders
+    @st.cache_resource
+    def load_model():
+        with gzip.open("mejor_modelo_redes.pkl.gz", 'rb') as f:
+            return pickle.load(f)
 
-@st.cache_resource
-def load_label_encoders():
-    with open("label_encoders.pkl", "rb") as f:
-        return pickle.load(f)
+    @st.cache_resource
+    def load_label_encoders():
+        with open("label_encoders.pkl", "rb") as f:
+            return pickle.load(f)
 
-model = load_model()
-label_encoders = load_label_encoders()
+    model = load_model()
+    label_encoders = load_label_encoders()
 
-# Diccionario de entrada del usuario
-user_input = {}
+    # Diccionario de entrada del usuario
+    user_input = {}
 
-for feature in descripciones.keys():
-    if df[feature].dtype == 'object':  # Si es categórica
-        opciones = df[feature].dropna().unique().tolist()
-        user_input[feature] = st.sidebar.selectbox(feature, opciones)
-    else:  # Si es numérica
-        min_val = df[feature].min()
-        max_val = df[feature].max()
-        if pd.notna(min_val) and pd.notna(max_val):  # Si tiene valores válidos
-            user_input[feature] = st.sidebar.slider(feature, float(min_val), float(max_val), float(min_val))
-        else:  # Si no hay un rango definido
-            user_input[feature] = st.sidebar.text_input(feature)
+    for feature in descripciones.keys():
+        if df[feature].dtype == 'object':  # Si es categórica
+            opciones = df[feature].dropna().unique().tolist()
+            user_input[feature] = st.sidebar.selectbox(feature, opciones)
+        else:  # Si es numérica
+            min_val = df[feature].min()
+            max_val = df[feature].max()
+            if pd.notna(min_val) and pd.notna(max_val):  # Si tiene valores válidos
+                user_input[feature] = st.sidebar.slider(feature, float(min_val), float(max_val), float(min_val))
+            else:  # Si no hay un rango definido
+                user_input[feature] = st.sidebar.text_input(feature)
 
-# Botón de predicción
-if st.sidebar.button("Predecir"):
-    try:
-        # Convertir datos categóricos con los label encoders
-        for feature in user_input.keys():
-            if feature in label_encoders:
-                user_input[feature] = label_encoders[feature].transform([user_input[feature]])[0]
-        
-        # Crear DataFrame con la entrada del usuario
-        input_df = pd.DataFrame([user_input])
-        
-        # Realizar la predicción
-        prediccion = model.predict(input_df)[0]
-        resultado = "Positivo para Alzheimer" if prediccion == 1 else "Negativo para Alzheimer"
-        
-        st.sidebar.write(f"🧾 **Resultado:** {resultado}")
-    except Exception as e:
-        st.sidebar.error(f"⚠️ Error en la predicción: {e}")
+    # Botón de predicción
+    if st.sidebar.button("Predecir"):
+        try:
+            # Convertir datos categóricos con los label encoders
+            for feature in user_input.keys():
+                if feature in label_encoders:
+                    user_input[feature] = label_encoders[feature].transform([user_input[feature]])[0]
+
+            # Crear DataFrame con la entrada del usuario
+            input_df = pd.DataFrame([user_input])
+
+            # Realizar la predicción
+            prediccion = model.predict(input_df)[0]
+            resultado = "Positivo para Alzheimer" if prediccion == 1 else "Negativo para Alzheimer"
+
+            st.sidebar.write(f"🧾 **Resultado:** {resultado}")
+        except Exception as e:
+            st.sidebar.error(f"⚠️ Error en la predicción: {e}")
+
+except FileNotFoundError:
+    st.error(f"⚠️ El archivo {file_path} no se encontró. Asegúrate de que está en la misma carpeta que el script.")
+
