@@ -78,6 +78,25 @@ try:
     variable_seleccionada = st.sidebar.selectbox("📌 Selecciona una variable:", list(descripciones.keys()))
     st.sidebar.write(f"**{variable_seleccionada}:** {descripciones[variable_seleccionada]}")
 
+    # Precisión del modelo
+    accuracy = 0.7094  # Ajusta según sea necesario
+
+    # Diseño en Streamlit
+    st.markdown("## 🎯 Mejores Hiperparámetros Encontrados")
+    st.markdown("""
+    💡 **Profundidad:** 5  
+    ⏳ **Épocas:** 8  
+    🔢 **Número de unidades:** 192  
+    ⚙️ **Optimizador:** Adam  
+    🔥 **Función de activación:** ReLU  
+    📦 **Tamaño del batch:** 80  
+    📉 **Tasa de aprendizaje:** 0.00048  
+    """)
+
+    st.markdown("## 📊 Precisión del Modelo")
+    st.metric(label="🔍 Accuracy del modelo", value=f"{accuracy:.2%}")
+
+    
     # **Formulario para predicción**
     st.sidebar.title("🔍 Predicción de Alzheimer")
     user_input = {}
