@@ -38,6 +38,9 @@ Incluye variables demográficas, de estilo de vida, médicas y genéticas.
 🔹 **Objetivo:** Analizar los factores asociados al Alzheimer y su impacto en diferentes poblaciones.
 """)
 
+# **Información general del dataset**
+st.subheader("📂 Información del Dataset")
+
 # Cargar el archivo CSV
 file_path = "alzheimers_prediction_dataset.csv"
 
