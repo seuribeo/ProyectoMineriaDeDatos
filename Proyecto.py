@@ -215,3 +215,20 @@ df[columna_categorica].value_counts().plot(kind="bar", ax=ax, color="skyblue")
 ax.set_title(f"Distribución de {columna_categorica}")
 st.pyplot(fig)
 
+
+
+
+
+
+# **Cantidad de categorías y sus valores en variables categóricas**
+st.subheader("📌 Variables Categóricas - Cantidad de Categorías")
+
+# Obtener información de las variables categóricas
+categorical_columns = df.select_dtypes(include=['object']).columns
+categorias_info = {col: {"Cantidad de Categorías": df[col].nunique(), "Categorías": ", ".join(map(str, df[col].unique()))} for col in categorical_columns}
+
+# Convertir a DataFrame
+categorias_df = pd.DataFrame.from_dict(categorias_info, orient='index')
+
+# Mostrar tabla con desplazamiento horizontal y vertical
+st.dataframe(categorias_df, height=400, width=800)
