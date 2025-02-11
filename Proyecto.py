@@ -216,28 +216,3 @@ ax.set_title(f"Distribución de {columna_categorica}")
 st.pyplot(fig)
 
 
-
-
-
-
-# **Cantidad de categorías y sus valores en variables categóricas**
-st.subheader("📌 Variables Categóricas - Cantidad de Categorías")
-
-# Obtener información de las variables categóricas
-categorical_columns = df.select_dtypes(include=['object']).columns
-categorias_info = {}
-
-for col in categorical_columns:
-    unique_values = df[col].unique()
-    num_categories = len(unique_values)
-    
-    # Mostrar hasta 10 valores y añadir "..." si hay más
-    displayed_values = ", ".join(map(str, unique_values[:10])) + ("..." if num_categories > 10 else "")
-    
-    categorias_info[col] = {"Cantidad de Categorías": num_categories, "Categorías": displayed_values}
-
-# Convertir a DataFrame
-categorias_df = pd.DataFrame.from_dict(categorias_info, orient='index')
-
-# Mostrar tabla con desplazamiento horizontal y vertical
-st.dataframe(categorias_df, height=400, width=800)
