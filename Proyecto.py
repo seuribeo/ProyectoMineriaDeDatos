@@ -185,3 +185,52 @@ fig, ax = plt.subplots()
 df[columna_categorica].value_counts().plot(kind="bar", ax=ax, color="skyblue")
 ax.set_title(f"Distribución de {columna_categorica}")
 st.pyplot(fig)
+
+
+
+
+
+
+import streamlit as st
+import gzip
+import pickle
+
+# Cargar el modelo
+@st.cache_resource
+def load_model():
+    filename = "mejor_modelo_redes.pkl.gz"
+    with gzip.open(filename, 'rb') as f:
+        model = pickle.load(f)
+    return model
+
+# Cargar el modelo
+model = load_model()
+
+# Mejores hiperparámetros encontrados
+best_hyperparameters = {
+    'depth': 5,
+    'epochs': 8,
+    'num_units': 192,
+    'optimizer': 'adam',
+    'activation': 'relu',
+    'batch_size': 80,
+    'learning_rate': 0.00048440417181462694
+}
+
+# Precisión del modelo
+accuracy = 0.7094  # Ajusta según sea necesario
+
+# Diseño en Streamlit
+st.markdown("## 🎯 Mejores Hiperparámetros Encontrados")
+st.markdown("""
+💡 **Profundidad:** 5  
+⏳ **Épocas:** 8  
+🔢 **Número de unidades:** 192  
+⚙️ **Optimizador:** Adam  
+🔥 **Función de activación:** ReLU  
+📦 **Tamaño del batch:** 80  
+📉 **Tasa de aprendizaje:** 0.00048  
+""")
+
+st.markdown("## 📊 Precisión del Modelo")
+st.metric(label="🔍 Accuracy del modelo", value=f"{accuracy:.2%}")
