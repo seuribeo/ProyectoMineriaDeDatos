@@ -186,8 +186,12 @@ st.subheader("📌 Variables Categóricas - Cantidad de Categorías")
 categorical_columns = df.select_dtypes(include=['object']).columns
 categorias_info = {col: {"Cantidad": df[col].nunique(), "Categorías": df[col].unique().tolist()} for col in categorical_columns}
 
-# Convertir a DataFrame para una mejor visualización
+# Convertir a DataFrame
 categorias_df = pd.DataFrame.from_dict(categorias_info, orient='index')
+
+# Mostrar en formato de texto si hay demasiadas categorías
+st.text(categorias_df.to_string())
+
 
 # Mostrar tabla en Streamlit
 st.dataframe(categorias_df)
