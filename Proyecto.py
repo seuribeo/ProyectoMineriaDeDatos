@@ -143,3 +143,48 @@ num_categoricas = df.select_dtypes(include=['object']).shape[1]
 num_numericas = df.select_dtypes(include=['number']).shape[1]
 st.markdown(f"- **Variables categóricas:** {num_categoricas}")
 st.markdown(f"- **Variables numéricas:** {num_numericas}")
+
+    # Información de tipos de datos
+    st.subheader("📋 Tipos de Datos y Valores Nulos")
+    buffer = io.StringIO()
+    df.info(buf=buffer)  # Capturar la salida de df.info()
+    info_df = buffer.getvalue()
+    st.text(info_df)  # Mostrar en Streamlit
+
+    # **Previsualización con barra interactiva**
+    st.subheader("👀 Vista Previa del Dataset")
+    num_rows = st.slider("📌 Selecciona el número de filas a mostrar:", min_value=1, max_value=100, value=5, step=1)
+    st.write(df.head(num_rows))
+
+    # **Estadísticas descriptivas**
+    st.subheader("📊 Estadísticas Descriptivas")
+    st.write(df.describe())
+
+    # **Cantidad de categorías en variables categóricas**
+    st.subheader("📌 Variables Categóricas - Cantidad de Categorías")
+    categorias_por_variable = df.select_dtypes(include=['object']).nunique()
+    st.write(categorias_por_variable)
+
+    # **Gráficos de distribución**
+    st.subheader("📈 Distribución de Variables Numéricas")
+
+    # Selector para elegir variable numérica y graficar
+    columna_numerica = st.selectbox("📌 Selecciona una variable numérica:", df.select_dtypes(include=['number']).columns)
+
+    # Histograma de la variable seleccionada
+    fig, ax = plt.subplots()
+    sns.histplot(df[columna_numerica], kde=True, bins=30, ax=ax)
+    ax.set_title(f"Distribución de {columna_numerica}")
+    st.pyplot(fig)
+
+    # **Gráfico de barras para variables categóricas**
+    st.subheader("📊 Visualización de Variables Categóricas")
+    columna_categorica = st.selectbox("📌 Selecciona una variable categórica:", df.select_dtypes(include=['object']).columns)
+
+    fig, ax = plt.subplots()
+    df[columna_categorica].value_counts().plot(kind="bar", ax=ax, color="skyblue")
+    ax.set_title(f"Distribución de {columna_categorica}")
+    st.pyplot(fig)
+
+except FileNotFoundError:
+    st.error(f"⚠️ El archivo {file_path} no se encontró. Asegúrate de que está en la misma carpeta que el script.")
