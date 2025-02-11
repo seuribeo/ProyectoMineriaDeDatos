@@ -82,7 +82,7 @@ try:
     accuracy = 0.7094  # Ajusta según sea necesario
 
     # Diseño en Streamlit
-    st.sidebar.title("## 🎯 Mejores Hiperparámetros Encontrados")
+    st.sidebar.title("🎯 Mejores Hiperparámetros Encontrados")
     st.sidebar.write("""
     💡 **Profundidad:** 5  
     ⏳ **Épocas:** 8  
@@ -93,7 +93,7 @@ try:
     📉 **Tasa de aprendizaje:** 0.00048  
     """)
 
-    st.sidebar.title("## 📊 Precisión del Modelo")
+    st.sidebar.title("📊 Precisión del Modelo")
     st.sidebar.metric(label="🔍 Accuracy del modelo", value=f"{accuracy:.2%}")
 
     
