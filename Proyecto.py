@@ -2,11 +2,10 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-import io  # Para capturar la salida de df.info()
+import io
 import numpy as np
-import gzip
-import pickle
 from sklearn.preprocessing import LabelEncoder
+from sklearn.ensemble import RandomForestClassifier
 
 # Configurar estilo de gráficos
 sns.set_style("whitegrid")
@@ -25,95 +24,79 @@ file_path = "alzheimers_prediction_dataset.csv"
 
 try:
     df = pd.read_csv(file_path)
-
-    st.sidebar.title("📌 Descripción de Variables")
     
-    descripciones = {
-        "Country": "País de origen del paciente.",
-        "Age": "Edad del paciente en años.",
-        "Gender": "Género del paciente (Masculino/Femenino).",
-        "Education Level": "Nivel educativo en años completados.",
-        "BMI": "Índice de Masa Corporal (IMC) del paciente.",
-        "Physical Activity Level": "Frecuencia de actividad física realizada.",
-        "Alzheimer’s Diagnosis": "Diagnóstico de Alzheimer (Sí/No)."
-    }
+    # **Ventana lateral con descripción de variables**
+    st.sidebar.title("📌 Predicción del Alzheimer")
     
-    variable_seleccionada = st.sidebar.selectbox("\U0001F4CC Selecciona una variable:", list(descripciones.keys()))
-    st.sidebar.write(f"**{variable_seleccionada}:** {descripciones[variable_seleccionada]}")
+    # Selección de características para la predicción
+    features = [
+        "Age", "Gender", "Education Level", "BMI", "Physical Activity Level", "Smoking Status", "Alcohol Consumption",
+        "Diabetes", "Hypertension", "Cholesterol Level", "Family History of Alzheimer’s", "Cognitive Test Score",
+        "Depression Level", "Sleep Quality", "Dietary Habits", "Air Pollution Exposure", "Employment Status",
+        "Marital Status", "Genetic Risk Factor (APOE-ε4 allele)", "Social Engagement Level", "Income Level",
+        "Stress Levels", "Urban vs Rural Living"
+    ]
+    
+    # Codificar variables categóricas
+    encoders = {}
+    df_encoded = df.copy()
+    
+    for col in df.select_dtypes(include=['object']).columns:
+        encoders[col] = LabelEncoder()
+        df_encoded[col] = encoders[col].fit_transform(df[col])
+    
+    # Modelo de predicción
+    X = df_encoded[features]
+    y = df_encoded["Alzheimer’s Diagnosis"]
+    
+    model = RandomForestClassifier(n_estimators=100, random_state=42)
+    model.fit(X, y)
+    
+    # Interfaz de usuario para ingresar valores de predicción
+    input_data = {}
+    
+    for feature in features:
+        if df[feature].dtype == 'object':
+            unique_values = df[feature].unique()
+            input_data[feature] = st.sidebar.selectbox(f"{feature}", unique_values)
+        else:
+            min_val, max_val = df[feature].min(), df[feature].max()
+            input_data[feature] = st.sidebar.slider(f"{feature}", min_val, max_val, min_val)
+    
+    # Transformar entrada del usuario
+    input_df = pd.DataFrame([input_data])
+    
+    for col in input_df.select_dtypes(include=['object']).columns:
+        input_df[col] = input_df[col].map(lambda x: encoders[col].transform([x])[0] if x in encoders[col].classes_ else 0)
+    
+    # Realizar predicción
+    prediction = model.predict(input_df)
+    prediction_label = "Positivo" if prediction[0] == 1 else "Negativo"
+    
+    st.sidebar.markdown(f"### 💡 Predicción: **{prediction_label}**")
 
+    # **Información general del dataset**
     st.subheader("📂 Información del Dataset")
-    
     st.markdown(f"- **Número de registros:** {df.shape[0]:,}")
     st.markdown(f"- **Número de columnas:** {df.shape[1]}")
     
-    buffer = io.StringIO()
-    df.info(buf=buffer)
-    st.text(buffer.getvalue())
-
-    st.subheader("👀 Vista Previa del Dataset")
-    num_rows = st.slider("\U0001F4CC Selecciona el número de filas a mostrar:", 1, 100, 5, 1)
-    st.write(df.head(num_rows))
-
-    st.subheader("📊 Estadísticas Descriptivas")
-    st.write(df.describe())
-
+    # **Gráficos**
     st.subheader("📈 Distribución de Variables Numéricas")
-    columna_numerica = st.selectbox("\U0001F4CC Selecciona una variable numérica:", df.select_dtypes(include=['number']).columns)
+    num_cols = df.select_dtypes(include=['number']).columns
+    selected_num_col = st.selectbox("📌 Selecciona una variable numérica:", num_cols)
     fig, ax = plt.subplots()
-    sns.histplot(df[columna_numerica], kde=True, bins=30, ax=ax)
-    ax.set_title(f"Distribución de {columna_numerica}")
+    sns.histplot(df[selected_num_col], kde=True, bins=30, ax=ax)
+    ax.set_title(f"Distribución de {selected_num_col}")
     st.pyplot(fig)
-
+    
+    # **Gráfico de barras para variables categóricas**
     st.subheader("📊 Visualización de Variables Categóricas")
-    columna_categorica = st.selectbox("\U0001F4CC Selecciona una variable categórica:", df.select_dtypes(include=['object']).columns)
+    cat_cols = df.select_dtypes(include=['object']).columns
+    selected_cat_col = st.selectbox("📌 Selecciona una variable categórica:", cat_cols)
     fig, ax = plt.subplots()
-    df[columna_categorica].value_counts().plot(kind="bar", ax=ax, color="skyblue")
-    ax.set_title(f"Distribución de {columna_categorica}")
+    df[selected_cat_col].value_counts().plot(kind="bar", ax=ax, color="skyblue")
+    ax.set_title(f"Distribución de {selected_cat_col}")
     st.pyplot(fig)
-
-    st.sidebar.subheader("\U0001F9E0 Predicción de Alzheimer")
     
-    @st.cache_resource
-    def load_model():
-        with gzip.open("mejor_modelo_redes.pkl.gz", 'rb') as f:
-            return pickle.load(f)
-
-    @st.cache_resource
-    def load_label_encoders():
-        with open("label_encoders.pkl", "rb") as f:
-            return pickle.load(f)
-
-    model = load_model()
-    label_encoders = load_label_encoders()
-
-    user_input = {}
-    
-    for feature in descripciones.keys():
-        if df[feature].dtype == 'object':
-            opciones = df[feature].dropna().unique().tolist()
-            user_input[feature] = st.sidebar.selectbox(feature, opciones)
-        else:
-            min_val, max_val = df[feature].min(), df[feature].max()
-            user_input[feature] = st.sidebar.slider(feature, float(min_val), float(max_val), float(min_val))
-    
-    if st.sidebar.button("Predecir"):
-        try:
-            for feature in user_input.keys():
-                if feature in label_encoders:
-                    if user_input[feature] not in label_encoders[feature].classes_:
-                        user_input[feature] = 'Unknown'
-                    user_input[feature] = label_encoders[feature].transform([user_input[feature]])[0]
-            
-            input_df = pd.DataFrame([user_input])
-            st.write("Entrada procesada para predicción:", input_df)
-            
-            prediccion = model.predict(input_df)[0]
-            resultado = "Positivo para Alzheimer" if prediccion == 1 else "Negativo para Alzheimer"
-            st.sidebar.write(f"\U0001F4FE **Resultado:** {resultado}")
-        except Exception as e:
-            st.sidebar.error(f"⚠️ Error en la predicción: {e}")
-
 except FileNotFoundError:
-    st.error(f"⚠️ El archivo {file_path} no se encontró.")
-
-
+    st.error(f"⚠️ El archivo {file_path} no se encontró. Asegúrate de que está en la misma carpeta que el script.")
