@@ -128,23 +128,6 @@ try:
             except Exception as e:
                 st.sidebar.error(f"Ocurrió un error al hacer la predicción: {str(e)}")
 
-            # Precisión del modelo
-            accuracy = 0.7094  # Ajusta según sea necesario
-
-# Diseño en Streamlit
-st.markdown("## 🎯 Mejores Hiperparámetros Encontrados")
-st.markdown("""
-💡 **Profundidad:** 5  
-⏳ **Épocas:** 8  
-🔢 **Número de unidades:** 192  
-⚙️ **Optimizador:** Adam  
-🔥 **Función de activación:** ReLU  
-📦 **Tamaño del batch:** 80  
-📉 **Tasa de aprendizaje:** 0.00048  
-""")
-
-st.markdown("## 📊 Precisión del Modelo")
-st.metric(label="🔍 Accuracy del modelo", value=f"{accuracy:.2%}")
 
 except FileNotFoundError:
     st.error(f"⚠️ El archivo {file_path} no se encontró. Asegúrate de que está en la misma carpeta que el script.")
