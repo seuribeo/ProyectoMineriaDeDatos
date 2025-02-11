@@ -64,6 +64,8 @@ try:
 
     # **Información general del dataset**
     st.subheader("📂 Información del Dataset")
+    
+    # Mostrar el número de registros y columnas
     st.markdown(f"- **Número de registros:** {df.shape[0]:,}")
     st.markdown(f"- **Número de columnas:** {df.shape[1]}")
 
@@ -89,54 +91,46 @@ try:
     st.subheader("📊 Estadísticas Descriptivas")
     st.write(df.describe())
 
-    # **Sección de predicción en la barra lateral**
-    st.sidebar.subheader("🔮 Predicción de Alzheimer")
+    # **Gráficos de distribución**
+    st.subheader("📈 Distribución de Variables Numéricas")
+    columna_numerica = st.selectbox("📌 Selecciona una variable numérica:", df.select_dtypes(include=['number']).columns)
+    fig, ax = plt.subplots()
+    sns.histplot(df[columna_numerica], kde=True, bins=30, ax=ax)
+    ax.set_title(f"Distribución de {columna_numerica}")
+    st.pyplot(fig)
+
+    # **Gráfico de barras para variables categóricas**
+    st.subheader("📊 Visualización de Variables Categóricas")
+    columna_categorica = st.selectbox("📌 Selecciona una variable categórica:", df.select_dtypes(include=['object']).columns)
+    fig, ax = plt.subplots()
+    df[columna_categorica].value_counts().plot(kind="bar", ax=ax, color="skyblue")
+    ax.set_title(f"Distribución de {columna_categorica}")
+    st.pyplot(fig)
+
+    # **Sección de Predicción en la Barra Lateral**
+    st.sidebar.subheader("🧠 Predicción de Alzheimer")
     
+    # Cargar modelo y label encoders
     @st.cache_resource
     def load_model():
-        filename = "mejor_modelo_redes.pkl.gz"
-        with gzip.open(filename, 'rb') as f:
-            model = pickle.load(f)
-        return model
+        with gzip.open("mejor_modelo_redes.pkl.gz", 'rb') as f:
+            return pickle.load(f)
 
     @st.cache_resource
     def load_label_encoders():
-        encoder_file = "label_encoders.pkl"
-        with open(encoder_file, "rb") as f:
-            encoders = pickle.load(f)
-        return encoders
+        with open("label_encoders.pkl", "rb") as f:
+            return pickle.load(f)
 
     model = load_model()
     label_encoders = load_label_encoders()
-
-    # Definir características categóricas y numéricas
-    categorical_features = list(label_encoders.keys())
-    numeric_features = ['Age', 'Education Level', 'Cognitive Test Score']
-    continuous_features = ['BMI']
+    
+    # Definir entradas
     user_input = {}
-
-    # Obtener valores de entrada numéricos
-    for feature in numeric_features:
-        user_input[feature] = st.sidebar.number_input(feature, min_value=0, step=1, format="%d")
-
-    for feature in continuous_features:
-        user_input[feature] = st.sidebar.number_input(feature, value=0.0, format="%.2f")
-
-    # Obtener valores de entrada categóricos
-    for feature in categorical_features:
-        user_input[feature] = st.sidebar.selectbox(feature, label_encoders[feature].classes_)
-
+    for feature in descripciones.keys():
+        user_input[feature] = st.sidebar.text_input(feature)
+    
     if st.sidebar.button("Predecir"):
-        df_input = pd.DataFrame([user_input])
-        for col in categorical_features:
-            df_input[col] = label_encoders[col].transform([user_input[col]])[0]
-        df_input = df_input.astype(np.float32)
-        input_array = df_input.to_numpy().reshape(1, -1)
-        prediction = np.argmax(model.predict(input_array))
-        resultado = "Positivo para Alzheimer" if prediction == 1 else "Negativo para Alzheimer"
-        st.sidebar.subheader("Resultado de la Predicción")
-        st.sidebar.write(resultado)
+        st.sidebar.write("Resultado: [Aquí se mostraría la predicción]")
 
 except FileNotFoundError:
     st.error(f"⚠️ El archivo {file_path} no se encontró. Asegúrate de que está en la misma carpeta que el script.")
-
